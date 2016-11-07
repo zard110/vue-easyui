@@ -28,11 +28,11 @@
     },
 
     mounted() {
-      LayoutEvents.$emit('add', this.region, {
+      LayoutEvents.$emit('add', this.$parent.$parent, this.region, {
         width: this.width,
         height: this.height
       })
-      console.log('child mounted', this.region, this.size)
+      console.log('child mounted', this, this.region, this.size)
     },
 
     beforeMount() {

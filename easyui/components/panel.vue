@@ -16,6 +16,7 @@
   import $ from 'jquery'
   import LayoutEvents from './layout.events'
   import _ from 'underscore'
+  import Panel from './panel.vue'
 
   $(window).on('resize', _.debounce(() => LayoutEvents.$emit('resize'), 200))
 
@@ -25,6 +26,7 @@
     props: {
       id: String,
       title: String,
+      region: String,
       width: Number,
       height: Number,
       top: Number,
@@ -43,6 +45,13 @@
       bodyClass: String
     },
 
+    data() {
+      return {
+        lastWidth: 0,
+        lastHeight: 0
+      }
+    },
+
     computed: {
       noHeader() {
         return !this.title
@@ -59,7 +68,7 @@
     },
 
     methods: {
-      doLayout () {
+      doLayout (life) {
         if (!this.doSize) return
 
         let el = $(this.$el),
@@ -73,8 +82,11 @@
 
         // 自适应父容器大小
         if (this.fit) {
-          let parent = el.parent()
-          width = parent.width(),
+          let parent = el
+          while(!parent.is('body') && !parent.is('.panel-body')) {
+            parent = parent.parent()
+          }
+          width = parent.width()
           height = parent.height()
         }
 
@@ -84,6 +96,12 @@
         el.css('left', this.left)
         el.css('top', this.top)
 
+        if (this.lastWidth == width && this.lastHeight == height) {
+          return
+        }
+        this.lastWidth = width
+        this.lastHeight = height
+
         // 指定大小或自适应
         el.outerWidth(width);
         el.outerHeight(height);
@@ -92,18 +110,29 @@
         let bHeight = el.height();
         bHeight -= header ? $(header).outerHeight() : 0
         $(body).outerHeight(bHeight);
+
+        console.log('$emit doLayout parent2 from: ', life,  {
+          id: this.id,
+          region: this.region,
+          width:this.width,
+          height:this.height,
+          doSize: this.doSize,
+          fit: this.fit,
+          border:this.border
+        })
+        this.$emit('doLayout', $(body).width(), $(body).height())
       }
     },
 
-    mounted() {
-      this.$nextTick(() => this.doLayout())
+    beforeMount() {
+      this.$nextTick(() => this.doLayout('beforeMount'))
     },
-    updated() {
-      this.$nextTick(() => this.doLayout())
+    beforeUpdate() {
+      this.$nextTick(() => this.doLayout('beforeUpdate'))
     },
     created() {
       LayoutEvents.$on('resize', () => this.$nextTick(() => {
-        this.doLayout()
+        this.doLayout('resize')
         LayoutEvents.$emit('doLayout')
       }))
     }

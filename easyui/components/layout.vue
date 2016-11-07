@@ -1,10 +1,12 @@
 <template>
-  <ce-panel class="layout" :fit="true" :border="false">
+  <ce-panel :id="id" class="layout" :fit="true" :border="false" @doLayout="doLayout">
 
     <ce-panel
       class="layout-panel"
       v-for="(panel, region) in panels"
       v-show="panel.show"
+      :id="panel.id"
+      :region="region"
       :ref="region"
       :do-size="panel.show" :width="panel.width" :height="panel.height" :left="panel.left" :top="panel.top"
       :class="[panel.regionClass]"
@@ -15,6 +17,12 @@
   </ce-panel>
 </template>
 
+<style>
+  .layout {
+    position: absolute;
+  }
+</style>
+
 <script>
   import $ from 'jquery'
   import LayoutEvents from './layout.events'
@@ -22,12 +30,17 @@
   export default {
     name: 'ce-layout',
 
+    props: {
+      id: String
+    },
+
     data() {
       return {
         panels: ['north', 'east', 'south', 'west', 'center'].reduce((panels, region) => {
           panels[region] = {
             show: false,
             regionClass: 'layout-panel-' + region,
+            id: this.id + '_' + region,
             width: 0, height: 0, left: 0, top: 0
           }
 
@@ -37,7 +50,9 @@
     },
 
     methods: {
-      addLayoutPanel(region, size) {
+      addLayoutPanel(layout, region, size) {
+        if (layout.$el !== this.$el) return
+
         console.log('in', this, region, size)
         let panel = this.panels[region]
         if (!panel) return
@@ -46,14 +61,17 @@
         panel.width = size.width ? size.width : 0
         panel.height = size.height ? size.height : 0
       },
-      doLayout() {
+      doLayout2(width, height) {
+        console.log('$on doLayout parent2', width, height)
+      },
+      doLayout(width, height) {
 
-        console.log('!!!!!!!!!!!!!!!!!! doLayout   !!!!!!!!!!!!!!')
+        console.log('$on doLayout parent2', this.id, width, height)
 
-        let el = $(this.$el),
+        let parent = $(this.$parent.$el),
 
-          width = el.width(),
-          height = el.height(),
+//          width = parent.width(),
+//          height = parent.height(),
 
           north = this.panels['north'],
           south = this.panels['south'],
@@ -76,7 +94,7 @@
 
     mounted() {
       console.log('parent mounted', this.panels)
-      this.$nextTick(() => this.doLayout())
+//      this.$nextTick(() => this.doLayout())
     },
 
     updated() {
@@ -85,13 +103,13 @@
     },
 
     beforeMount() {
+//      this.$nextTick(() => this.doLayout())
       console.log('parent beforeMount', this.panels)
-
     },
 
     created() {
       LayoutEvents.$on('add', this.addLayoutPanel)
-      LayoutEvents.$on('doLayout', this.doLayout)
+//      LayoutEvents.$on('doLayout', this.doLayout)
       console.log('parent created', this.panels)
     },
 
