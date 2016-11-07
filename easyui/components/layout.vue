@@ -1,5 +1,10 @@
 <template>
-  <ce-panel :id="id" class="layout" :fit="true" :border="false" @doLayout="doLayout">
+  <ce-panel
+    class="layout"
+    :id="id"
+    :fit="true" :parent-el="parentEl"
+    :border="false"
+    @resize="doLayout">
 
     <ce-panel
       class="layout-panel"
@@ -34,6 +39,12 @@
       id: String
     },
 
+    computed: {
+      parentEl() {
+        return $(this.$el).parent()
+      }
+    },
+
     data() {
       return {
         panels: ['north', 'east', 'south', 'west', 'center'].reduce((panels, region) => {
@@ -46,6 +57,7 @@
 
           return panels
         }, {})
+
       }
     },
 
@@ -94,7 +106,7 @@
 
     mounted() {
       console.log('parent mounted', this.panels)
-//      this.$nextTick(() => this.doLayout())
+      console.log('!!!!!!!', this.id, $(this.$parent.$el))
     },
 
     updated() {
@@ -105,6 +117,7 @@
     beforeMount() {
 //      this.$nextTick(() => this.doLayout())
       console.log('parent beforeMount', this.panels)
+
     },
 
     created() {

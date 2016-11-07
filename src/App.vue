@@ -20,9 +20,6 @@
 
   </ce-layout>
 
-  <!--<ce-panel :id="id" class="layout" :fit="true" :border="false">-->
-    <!--<slot></slot>-->
-  <!--</ce-panel>-->
 </template>
 
 <style>

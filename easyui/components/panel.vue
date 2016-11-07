@@ -16,7 +16,6 @@
   import $ from 'jquery'
   import LayoutEvents from './layout.events'
   import _ from 'underscore'
-  import Panel from './panel.vue'
 
   $(window).on('resize', _.debounce(() => LayoutEvents.$emit('resize'), 200))
 
@@ -24,6 +23,7 @@
     name: 'ce-panel',
 
     props: {
+      parentEL: Object,
       id: String,
       title: String,
       region: String,
@@ -63,12 +63,19 @@
         return !!this.iconClass
       },
       tools() {
-        return
       }
     },
 
     methods: {
-      doLayout (life) {
+      getLayoutWidth() {
+
+      },
+
+      getLayoutHeight() {
+
+      },
+
+      doLayout () {
         if (!this.doSize) return
 
         let el = $(this.$el),
@@ -82,6 +89,8 @@
 
         // 自适应父容器大小
         if (this.fit) {
+
+          // 使用第一个panel-body或者body元素作为父容器
           let parent = el
           while(!parent.is('body') && !parent.is('.panel-body')) {
             parent = parent.parent()
@@ -90,41 +99,32 @@
           height = parent.height()
         }
 
-        console.log('panel resize via jquery')
-
-        // position
+        // 移动位置
         el.css('left', this.left)
         el.css('top', this.top)
 
+        // 如果大小没有改变，不进行后续操作
         if (this.lastWidth == width && this.lastHeight == height) {
           return
         }
+
+        // 改变大小
+        el.outerWidth(width);
+        el.outerHeight(height);
         this.lastWidth = width
         this.lastHeight = height
 
-        // 指定大小或自适应
-        el.outerWidth(width);
-        el.outerHeight(height);
-
-        // 调整 body
+        // 调整 body 大小
         let bHeight = el.height();
         bHeight -= header ? $(header).outerHeight() : 0
         $(body).outerHeight(bHeight);
 
-        console.log('$emit doLayout parent2 from: ', life,  {
-          id: this.id,
-          region: this.region,
-          width:this.width,
-          height:this.height,
-          doSize: this.doSize,
-          fit: this.fit,
-          border:this.border
-        })
-        this.$emit('doLayout', $(body).width(), $(body).height())
+        this.$emit('resize', $(body).width(), $(body).height())
       }
     },
 
     beforeMount() {
+      console.log('!!!!!!!', this.parentEL)
       this.$nextTick(() => this.doLayout('beforeMount'))
     },
     beforeUpdate() {
