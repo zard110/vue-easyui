@@ -20,6 +20,12 @@
       <slot :name="region"></slot>
     </ce-panel>
 
+    <div class="layout-split-proxy-h" v-show="splittingH" 
+         style="display: block; left: 0; height: 5px;" :style="splittingHStyle"></div>
+    <div class="layout-split-proxy-v" v-show="splittingV"
+         style="display: block; top: 0; width: 5px;" :style="splittingVStyle"></div>
+    <div class="layout-mask" v-show="splitting"
+         style="top: 0; left: 0;" :style="layoutMaskStyle"></div>
   </ce-panel>
 </template>
 
@@ -47,19 +53,80 @@
       return {
         /**
          * 布局的子面板，按照方位分为：东、西、南、北、中5块
-         * 其中，“南”和“北”固定高度，“东”和“西”固定宽度，“中”按照屏幕剩余自适应
+         * 其中，“南” 和 “北” 固定高度，“东” 和 “西” 固定宽度，“中” 按照屏幕剩余自适应
          * 一开始默认这些面板隐藏，待 add 事件后显示对应的面板
          */
         panels: ['north', 'east', 'south', 'west', 'center'].reduce((panels, region) => {
           panels[region] = {
-            show: false,
-            regionClass: 'layout-panel-' + region,
             id: 'layout_panel_' + this.id + '_' + region,
+            show: false,
+            split: false,
+            splitting: true,
+            splitClass: '',
+            regionClass: 'layout-panel-' + region,
             width: 0, height: 0, left: 0, top: 0
           }
 
           return panels
-        }, {})
+        }, {}),
+
+        /**
+         * 容器宽度
+         */
+        width: 0,
+
+        /**
+         * 容器高度
+         */
+        height: 0,
+
+        splitTop: 0,
+
+        splitLeft: 0
+      }
+    },
+
+    computed: {
+      /**
+       * 是否正在 split
+       */
+      splitting() {
+        return ['north', 'east', 'south', 'west'].some(region => this.panels[region].splitting)
+      },
+
+      /**
+       * 是否正在垂直 split
+       */
+      splittingH() {
+        return ['east', 'west'].some(region => this.panels[region].splitting)
+      },
+
+      /**
+       * 是否正在水平 split
+       */
+      splittingV() {
+        return ['north', 'south'].some(region => this.panels[region].splitting)
+      },
+
+      layoutMaskStyle() {
+        return {
+          width: this.width + 'px',
+          height: this.height + 'px'
+        }
+      },
+
+      splittingVStyle() {
+        return {
+          top: this.splitTop + 'px',
+          width: this.width + 'px'
+        }
+      },
+
+      splittingHStyle() {
+        return {
+          left: this.splitLeft + 'px',
+          height: this.height + 'px'
+        }
       }
     },
 
@@ -129,6 +196,8 @@
       offsetEast = (east.show && !east.split) ? 1 : 0,
       offsetWidth = offsetWest + offsetEast
 
+    this.width = width
+    this.height = height
 
     // size
     north.width = south.width = width
