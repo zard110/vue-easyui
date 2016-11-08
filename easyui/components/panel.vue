@@ -17,7 +17,7 @@
   import LayoutEvents from './layout.events'
   import _ from 'underscore'
 
-  $(window).on('resize', _.debounce(() => LayoutEvents.$emit('resize'), 200))
+  $(window).on('resize', _.debounce(() => LayoutEvents.$emit('window-resize'), 200))
 
   export default {
     name: 'ce-panel',
@@ -26,7 +26,6 @@
       parentEL: Object,
       id: String,
       title: String,
-      region: String,
       width: Number,
       height: Number,
       top: Number,
@@ -67,74 +66,92 @@
     },
 
     methods: {
-      getLayoutWidth() {
-
-      },
-
-      getLayoutHeight() {
-
-      },
-
-      doLayout () {
-        if (!this.doSize) return
-
-        let el = $(this.$el),
-          header = this.$refs.header,
-          body = this.$refs.body,
-          width = this.width,
-          height = this.height
-
-        // 如果节点不可见，不进行后续操作
-        if (el.is(':hidden')) return
-
-        // 自适应父容器大小
-        if (this.fit) {
-
-          // 使用第一个panel-body或者body元素作为父容器
-          let parent = el
-          while(!parent.is('body') && !parent.is('.panel-body')) {
-            parent = parent.parent()
-          }
-          width = parent.width()
-          height = parent.height()
-        }
-
-        // 移动位置
-        el.css('left', this.left)
-        el.css('top', this.top)
-
-        // 如果大小没有改变，不进行后续操作
-        if (this.lastWidth == width && this.lastHeight == height) {
-          return
-        }
-
-        // 改变大小
-        el.outerWidth(width);
-        el.outerHeight(height);
-        this.lastWidth = width
-        this.lastHeight = height
-
-        // 调整 body 大小
-        let bHeight = el.height();
-        bHeight -= header ? $(header).outerHeight() : 0
-        $(body).outerHeight(bHeight);
-
-        this.$emit('resize', $(body).width(), $(body).height())
-      }
+      getLayoutSize,
+      setLayoutSize,
+      move,
+      resize
     },
 
     beforeMount() {
-      console.log('!!!!!!!', this.parentEL)
-      this.$nextTick(() => this.doLayout('beforeMount'))
+      this.$nextTick(() => this.resize())
     },
     beforeUpdate() {
-      this.$nextTick(() => this.doLayout('beforeUpdate'))
+      this.$nextTick(() => this.resize())
     },
     created() {
-      LayoutEvents.$on('resize', () => this.$nextTick(() => {
-        this.doLayout('resize')
-        LayoutEvents.$emit('doLayout')
-      }))
+      LayoutEvents.$on('window-resize', () => {
+        if (this.$el === this.$root.$el) {
+          console.log('to resize', this.id)
+          this.$nextTick(() => this.resize())
+        }
+      })
     }
+  }
+
+  function getLayoutSize() {
+    let width = this.width
+      , height = this.height
+
+    // 充满父容器
+    if (this.fit) {
+      let el = $(this.$el).parent()
+      while (!el.is('body') && !el.is('.panel-body')) {
+        el = el.parent()
+      }
+      width = el.width()
+      height = el.height()
+    }
+
+    return { width, height }
+  }
+
+  function setLayoutSize(width, height) {
+    console.log('resize', this.id, width, height)
+
+    let el = $(this.$el),
+      header = this.$refs.header,
+      body = this.$refs.body
+
+    // 改变大小
+    el.outerWidth(width);
+    el.outerHeight(height);
+    this.lastWidth = width
+    this.lastHeight = height
+
+    // 调整 body 大小
+    let bHeight = el.height()
+    bHeight -= header ? $(header).outerHeight() : 0
+    $(body).outerHeight(bHeight);
+
+    this.$emit('resize', $(body).width(), $(body).height())
+  }
+
+  function move(x, y) {
+    let el = $(this.$el)
+    el.css('left', x)
+    el.css('top', y)
+  }
+
+  function resize () {
+    if (!this.doSize) return
+
+    let el = $(this.$el)
+
+    // 如果节点不可见，不进行后续操作
+    if (el.is(':hidden')) return
+
+    // 移动位置
+    this.move(this.left, this.top)
+
+    let size = this.getLayoutSize()
+      , width = size.width
+      , height = size.height
+
+    // 如果大小没有改变，不进行后续操作
+    if (this.lastWidth == width && this.lastHeight == height) {
+      return
+    }
+
+    this.setLayoutSize(width, height)
   }
 </script>

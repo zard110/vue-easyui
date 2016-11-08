@@ -32,19 +32,15 @@
         width: this.width,
         height: this.height
       })
-      console.log('child mounted', this, this.region, this.size)
     },
 
     beforeMount() {
-      console.log('child beforeMount', this.region, this.size)
     },
 
     created() {
-      console.log('child created', this.region, this.size)
     },
 
     beforeCreate() {
-      console.log('child beforeCreate', this.region, this.size)
     }
 
   }
