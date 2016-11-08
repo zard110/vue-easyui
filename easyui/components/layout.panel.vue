@@ -11,7 +11,14 @@
     name: 'ce-layout-panel',
 
     props: {
+      /**
+       *
+       */
       size: Number,
+
+      /**
+       * 
+       */
       region: {
         type: String,
         required: true
@@ -20,10 +27,10 @@
 
     computed: {
       width() {
-        return ['west', 'east'].indexOf(this.region) > -1 ? this.size : undefined
+        return ~['west', 'east'].indexOf(this.region) ? this.size : undefined
       },
       height() {
-        return ['north', 'south'].indexOf(this.region) > -1 ? this.size : undefined
+        return ~['north', 'south'].indexOf(this.region) ? this.size : undefined
       }
     },
 

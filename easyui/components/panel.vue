@@ -99,12 +99,12 @@
     data() {
       return {
         /**
-         * current width of the panel
+         * Current width of the panel
          */
         currentWidth: 0,
 
         /**
-         * current height of the panel
+         * Current height of the panel
          */
         currentHeight: 0
       }
@@ -201,15 +201,15 @@
       body = this.$refs.body
 
     // 改变大小
-    el.outerWidth(width);
-    el.outerHeight(height);
+    el.outerWidth(width)
+    el.outerHeight(height)
     this.currentWidth = width
     this.currentHeight = height
 
     // 调整 body 大小
     let bHeight = el.height()
     bHeight -= header ? $(header).outerHeight() : 0
-    $(body).outerHeight(bHeight);
+    $(body).outerHeight(bHeight)
 
     this.$emit('resize', $(body).width(), $(body).height())
   }
