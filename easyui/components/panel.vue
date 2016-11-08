@@ -189,7 +189,7 @@
   }
 
   /**
-   * 设置面包布局大小
+   * 设置面板布局大小
    * @param width
    * @param height
    */
