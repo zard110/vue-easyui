@@ -12,6 +12,8 @@
       v-show="panel.show"
       :id="panel.id"
       :ref="region"
+      :title="panel.title"
+      :icon-class="panel.iconClass"
       :do-size="panel.show" :width="panel.width" :height="panel.height" :left="panel.left" :top="panel.top"
       :class="[panel.regionClass]"
       body-class="layout-body">
@@ -51,7 +53,7 @@
             show: false,
             regionClass: 'layout-panel-' + region,
             id: this.id + '_' + region,
-            width: 0, height: 0, left: 0, top: 0
+            width: 1, height: 1, left: 0, top: 0
           }
 
           return panels
@@ -61,38 +63,8 @@
     },
 
     methods: {
-      addLayoutPanel(layout, region, size) {
-        if (layout.$el !== this.$el) return
-
-        let panel = this.panels[region]
-        if (!panel) return
-
-        panel.show = true
-        panel.width = size.width ? size.width : 0
-        panel.height = size.height ? size.height : 0
-      },
-
-      doLayout(width, height) {
-
-        let north = this.panels['north'],
-          south = this.panels['south'],
-          west = this.panels['west'],
-          east = this.panels['east'],
-          center = this.panels['center']
-
-        // size
-        north.width = south.width = width;
-        west.height = east.height = center.height = height - (north.show ? north.height - 1 : 0) - (south.show ? south.height - 1 : 0)
-        center.width = width - (east.show ? east.width - 1 : 0) - (west.show ? west.width - 1 : 0)
-
-        // position
-        west.top = east.top = center.top = north.show ? north.height - 1 : 0
-        center.left = west.show ? west.width - 1 : 0
-        south.top = center.top + center.height - 1
-        east.left = center.left + center.width - 1
-
-        console.log('doLayout', width, height)
-      }
+      addLayoutPanel,
+      doLayout
     },
 
     mounted() {
@@ -114,4 +86,38 @@
     }
   }
 
+  function addLayoutPanel(layout, region, size) {
+    if (layout.$el !== this.$el) return
+
+    let panel = this.panels[region]
+    if (!panel) return
+
+    panel.show = true
+    panel.width = size.width ? size.width : 0
+    panel.height = size.height ? size.height : 0
+  }
+
+  function doLayout(width, height) {
+
+    let north = this.panels['north'],
+      south = this.panels['south'],
+      west = this.panels['west'],
+      east = this.panels['east'],
+      center = this.panels['center']
+
+    // size
+    north.width = south.width = width;
+    west.height = east.height = center.height = height - (north.show ? north.height - 1 : 0) - (south.show ? south.height - 1 : 0)
+    center.width = width - (east.show ? east.width - 1 : 0) - (west.show ? west.width - 1 : 0)
+
+    // position
+    west.top = east.top = center.top = north.show ? north.height - 1 : 0
+    center.left = west.show ? west.width - 1 : 0
+    south.top = center.top + center.height - 1
+    east.left = center.left + center.width - 1
+
+    //
+
+    console.log('doLayout', width, height)
+  }
 </script>
