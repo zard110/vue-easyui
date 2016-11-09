@@ -93,7 +93,9 @@
       /**
        * Add a CSS class to the panel body.
        */
-      bodyClass: String
+      bodyClass: String,
+
+      splitHandles: String
     },
 
     data() {
@@ -106,7 +108,9 @@
         /**
          * Current height of the panel
          */
-        currentHeight: 0
+        currentHeight: 0,
+
+        isSplit: false
       }
     },
 
@@ -147,7 +151,8 @@
       getLayoutSize,
       setLayoutSize,
       move,
-      resize
+      resize,
+      initSplit
     },
 
     beforeMount() {
@@ -159,11 +164,38 @@
       if (this.$el === this.$root.$el) {
         LayoutEvents.$on('window-resize', () => this.$nextTick(() => this.resize()))
       }
+
+      this.initSplit()
+    },
+    updated() {
+      this.initSplit()
     },
     beforeUpdate() {
       this.$nextTick(() => this.resize())
     },
     created() {
+    }
+  }
+
+  function initSplit() {
+    let el = $(this.$el)
+
+    if (!this.isSplit && this.splitHandles) {
+      console.log('split', this.id, this.splitHandles)
+      el.resizable({
+        handles: this.splitHandles,
+        edge: 10,
+        onStartResize(e) {
+          console.log('onStartResize', this, e, arguments)
+        },
+        onResize(e) {
+          console.log('onResize', this, e, arguments)
+        },
+        onStopResize(e) {
+          console.log('onStopResize', this, e, arguments)
+        }
+      })
+      this.isSplit = true
     }
   }
 

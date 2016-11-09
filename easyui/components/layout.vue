@@ -14,13 +14,14 @@
       :ref="region"
       :title="panel.title"
       :icon-class="panel.iconClass"
+      :split-handles="panel.splitHandles"
       :do-size="panel.show" :width="panel.width" :height="panel.height" :left="panel.left" :top="panel.top"
       :class="[panel.regionClass, panel.splitClass]"
       body-class="layout-body">
       <slot :name="region"></slot>
     </ce-panel>
 
-    <div class="layout-split-proxy-h" v-show="splittingH" 
+    <div class="layout-split-proxy-h" v-show="splittingH"
          style="display: block; left: 0; height: 5px;" :style="splittingHStyle"></div>
     <div class="layout-split-proxy-v" v-show="splittingV"
          style="display: block; top: 0; width: 5px;" :style="splittingVStyle"></div>
@@ -61,7 +62,7 @@
             id: 'layout_panel_' + this.id + '_' + region,
             show: false,
             split: false,
-            splitting: true,
+            splitting: false,
             splitClass: '',
             regionClass: 'layout-panel-' + region,
             width: 0, height: 0, left: 0, top: 0
@@ -163,6 +164,9 @@
    * @param info
    */
   function addLayoutPanel(layout, region, info) {
+
+    console.log('addPanel', this.region, info)
+
     if (layout.$el !== this.$el) return
 
     let panel = this.panels[region]
@@ -172,6 +176,7 @@
     panel.width = info.width ? info.width : 0
     panel.height = info.height ? info.height : 0
     panel.split = info.split
+    panel.splitHandles = info.splitHandles
     panel.splitClass = info.splitClass
   }
 

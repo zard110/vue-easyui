@@ -1,3 +1,9 @@
+<script>
+  export default {
+
+  }
+</script>
+
 <template>
   <ce-layout id="parent">
     <ce-layout-panel slot="north" region="north" :size="64" :split="true">north</ce-layout-panel>
@@ -13,11 +19,3 @@
   </ce-layout>
 
 </template>
-
-
-
-<script>
-  export default {
-
-  }
-</script>

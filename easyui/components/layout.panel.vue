@@ -48,8 +48,24 @@
 
       splitClass() {
         return this.split ? 'layout-split-' + this.region : undefined
-      }
+      },
 
+      splitHandles() {
+        if (!this.split) return
+
+        switch (this.region) {
+          case 'west':
+            return 'e'
+          case 'east':
+            return 'w'
+          case 'north':
+            return 's'
+          case 'south':
+            return 'n'
+          default:
+            return
+        }
+      }
     },
 
     mounted() {
@@ -64,6 +80,7 @@
         width: this.width,
         height: this.height,
         split: this.split,
+        splitHandles: this.splitHandles,
         splitClass: this.splitClass
       })
     },
