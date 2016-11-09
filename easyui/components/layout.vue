@@ -17,7 +17,11 @@
       :split-handles="panel.splitHandles"
       :do-size="panel.show" :width="panel.width" :height="panel.height" :left="panel.left" :top="panel.top"
       :class="[panel.regionClass, panel.splitClass]"
-      body-class="layout-body">
+      body-class="layout-body"
+
+      @onStartResize="onStartResize"
+      @onStopResize="onStopResize"
+      @onResize="onResize">
       <slot :name="region"></slot>
     </ce-panel>
 
@@ -133,7 +137,10 @@
 
     methods: {
       addLayoutPanel,
-      doLayout
+      doLayout,
+      onStartResize,
+      onStopResize,
+      onResize
     },
 
     mounted() {
@@ -154,6 +161,21 @@
 
     beforeCreate() {
     }
+  }
+
+  function onStopResize(e) {
+    let data = e.data
+    console.log('onStopResize', data)
+  }
+
+  function onResize(e) {
+    let data = e.data
+    console.log('onResize', data)
+  }
+
+  function onStartResize(e) {
+    let data = e.data
+    console.log('onStartResize', data)
   }
 
   /**

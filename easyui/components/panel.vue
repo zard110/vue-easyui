@@ -178,7 +178,8 @@
   }
 
   function initSplit() {
-    let el = $(this.$el)
+    let el = $(this.$el),
+      vm = this
 
     if (!this.isSplit && this.splitHandles) {
       console.log('split', this.id, this.splitHandles)
@@ -186,13 +187,13 @@
         handles: this.splitHandles,
         edge: 10,
         onStartResize(e) {
-          console.log('onStartResize', this, e, arguments)
+          vm.$emit('onStartResize', e)
         },
         onResize(e) {
-          console.log('onResize', this, e, arguments)
+          vm.$emit('onResize', e)
         },
         onStopResize(e) {
-          console.log('onStopResize', this, e, arguments)
+          vm.$emit('onStopResize', e)
         }
       })
       this.isSplit = true
