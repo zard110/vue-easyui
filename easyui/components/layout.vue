@@ -140,7 +140,8 @@
       doLayout,
       onStartResize,
       onStopResize,
-      onResize
+      onResize,
+      setSplitStyle
     },
 
     mounted() {
@@ -164,18 +165,85 @@
   }
 
   function onStopResize(e) {
-    let data = e.data
-    console.log('onStopResize', data)
+    let data = e.data,
+      region = getResizeRegion(data.dir),
+      panel = this.panels[region]
+
+    if (panel) {
+      panel.splitting = false
+
+      switch (region) {
+        case 'west':
+        case 'east':
+          panel.width = data.width
+          break
+        case 'north':
+        case 'south':
+          panel.height = data.height
+          break
+        default:
+          return
+      }
+
+      this.doLayout(this.width, this.height)
+    }
+    console.log('onStopResize', Object.assign({}, data))
+  }
+
+  function setSplitStyle(region, data) {
+    switch (region) {
+      case 'west':
+        this.splitLeft = data.left + (data.width - data.startWidth) + data.startWidth - data.deltaWidth
+        break
+      case 'east':
+        this.splitLeft = data.left
+        break
+      case 'north':
+        this.splitTop = data.top + (data.height - data.startHeight) + data.startHeight - data.deltaHeight
+        break
+      case 'south':
+        this.splitTop = data.top
+        break
+      default:
+        return
+    }
   }
 
   function onResize(e) {
-    let data = e.data
-    console.log('onResize', data)
+    let data = e.data,
+      region = getResizeRegion(data.dir),
+      panel = this.panels[region]
+
+    if (panel) {
+      this.setSplitStyle(region, data)
+    }
   }
 
   function onStartResize(e) {
-    let data = e.data
-    console.log('onStartResize', data)
+    let data = e.data,
+      region = getResizeRegion(data.dir),
+      panel = this.panels[region]
+
+    if (panel) {
+      panel.splitting = true
+      this.setSplitStyle(region, data)
+    }
+    console.log('onStartResize', Object.assign({}, data))
+  }
+
+  function getResizeRegion(dir) {
+    switch (dir) {
+      case 'e':
+        return 'west'
+      case 'w':
+        return 'east'
+      case 'n':
+        return 'south'
+      case 's':
+        return 'north'
+      default:
+        return
+    }
   }
 
   /**

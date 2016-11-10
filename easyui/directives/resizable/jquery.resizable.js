@@ -104,8 +104,10 @@ export default () => {
 //			isResizing = false;
         $.fn.resizable.isResizing = false;
         resize(e, true);
-        applySize(e);
-        $.data(e.data.target, 'resizable').options.onStopResize.call(e.data.target, e);
+
+        if ($.data(e.data.target, 'resizable').options.onStopResize.call(e.data.target, e) != false) {
+          applySize(e);
+        }
         $(document).unbind('.resizable');
         $('body').css('cursor','');
 //			$('body').css('cursor','auto');

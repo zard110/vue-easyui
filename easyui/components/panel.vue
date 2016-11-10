@@ -191,9 +191,11 @@
         },
         onResize(e) {
           vm.$emit('onResize', e)
+          return false
         },
         onStopResize(e) {
           vm.$emit('onStopResize', e)
+          return false
         }
       })
       this.isSplit = true
