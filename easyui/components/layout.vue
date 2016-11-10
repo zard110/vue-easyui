@@ -255,7 +255,7 @@
    */
   function addLayoutPanel(layout, region, info) {
 
-    console.log('addPanel', this.region, info)
+    console.log('addPanel', this.id, region, info)
 
     if (layout.$el !== this.$el) return
 
