@@ -241,8 +241,8 @@
     console.log('resize', this.id, width, height)
 
     let el = $(this.$el),
-      header = this.$refs.header,
-      body = this.$refs.body
+      header = this.$refs['header'],
+      body = this.$refs['body']
 
     // 改变大小
     el.outerWidth(width)
