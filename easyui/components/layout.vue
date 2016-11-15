@@ -9,7 +9,7 @@
     <ce-panel
       class="layout-panel"
       v-for="(panel, region) in panels"
-      v-show="panel.show"
+      v-if="panel.show"
       :id="panel.id"
       :ref="region"
       :title="panel.title"
@@ -22,15 +22,19 @@
       @onStartResize="onStartResize"
       @onStopResize="onStopResize"
       @onResize="onResize">
-      <slot :name="region"></slot>
+
+      {{panel.width}}×{{panel.height}}
+
     </ce-panel>
 
     <div class="layout-split-proxy-h" v-show="splittingH"
          style="display: block; left: 0; height: 5px;" :style="splittingHStyle"></div>
     <div class="layout-split-proxy-v" v-show="splittingV"
-         style="display: block; top: 0; width: 5px;" :style="splittingVStyle"></div>
+         style="display: block; width: 5px;" :style="splittingVStyle"></div>
     <div class="layout-mask" v-show="splitting"
          style="top: 0; left: 0;" :style="layoutMaskStyle"></div>
+
+    <slot></slot>
   </ce-panel>
 </template>
 
@@ -129,8 +133,9 @@
 
       splittingHStyle() {
         return {
+          top: this.panels['center'].top + 'px',
           left: this.splitLeft + 'px',
-          height: this.height + 'px'
+          height: this.panels['center'].height + 'px'
         }
       }
     },
@@ -157,7 +162,7 @@
 
     created() {
       // 添加对应的面板
-      LayoutEvents.$on('add', this.addLayoutPanel)
+//      LayoutEvents.$on('add', this.addLayoutPanel)
     },
 
     beforeCreate() {
@@ -253,11 +258,11 @@
    * @param region
    * @param info
    */
-  function addLayoutPanel(layout, region, info) {
+  function addLayoutPanel(region, info) {
 
     console.log('addPanel', this.id, region, info)
 
-    if (layout.$el !== this.$el) return
+//    this.panels = Object.assign({}, this.panels, info)
 
     let panel = this.panels[region]
     if (!panel) return

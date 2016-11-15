@@ -1,7 +1,5 @@
 <template>
-  <div>
-    <slot></slot>
-  </div>
+  <div></div>
 </template>
 
 <script>
@@ -75,8 +73,16 @@
     },
 
     created() {
-      // 触发父容器添加面板事件
-      LayoutEvents.$emit('add', this.$parent.$parent, this.region, {
+      let parent = this.$parent
+      while (parent && !parent['addLayoutPanel']) {
+          parent = parent.$parent
+      }
+
+      if (!parent) {
+          throw new Error('layout.panel MUST BE in layout!')
+      }
+
+      parent['addLayoutPanel'](this.region, {
         width: this.width,
         height: this.height,
         split: this.split,
