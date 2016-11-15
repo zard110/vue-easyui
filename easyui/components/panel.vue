@@ -212,10 +212,19 @@
 
     // 充满父容器
     if (this.fit) {
-      let el = $(this.$el).parent()
-      while (!el.is('body') && !el.is('.panel-body')) {
-        el = el.parent()
+      let parent = this.$parent,el
+
+      while (parent && !parent.$refs['body']) {
+        parent = parent.$parent
       }
+
+      if (!parent) {
+          el = $('body')
+      }
+      else {
+          el = $(parent.$el)
+      }
+
       width = el.width()
       height = el.height()
     }
