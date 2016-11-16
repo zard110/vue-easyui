@@ -27,6 +27,9 @@
 
     </ce-panel>
 
+    <ce-panel v-if="panel.collapsible" class="layout-expand"
+              :class="[panel.expandClass]" :width=""></ce-panel>
+
     <div class="layout-split-proxy-h" v-show="splittingH"
          style="display: block; left: 0; height: 5px;" :style="splittingHStyle"></div>
     <div class="layout-split-proxy-v" v-show="splittingV"
@@ -268,11 +271,14 @@
     if (!panel) return
 
     panel.show = true
+    panel.title = info.title
     panel.width = info.width ? info.width : 0
     panel.height = info.height ? info.height : 0
     panel.split = info.split
     panel.splitHandles = info.splitHandles
     panel.splitClass = info.splitClass
+    panel.collapsible = info.collapsible
+    panel.collapsedSize = info.collapsedSize
   }
 
   /**

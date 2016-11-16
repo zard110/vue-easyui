@@ -23,10 +23,19 @@
         required: true
       },
 
+      title: String,
+
       /**
        * True to show a split bar which user can change the panel size.
        */
-      split: Boolean
+      split: Boolean,
+
+      collapsible: Boolean,
+
+      collapsedSize: {
+          type: Number,
+          default: 28
+      }
     },
 
     computed: {
@@ -86,8 +95,11 @@
         width: this.width,
         height: this.height,
         split: this.split,
+        title: this.title,
         splitHandles: this.splitHandles,
-        splitClass: this.splitClass
+        splitClass: this.splitClass,
+        collapsible: this.collapsible,
+        collapsedSize: this.collapsedSize
       })
     },
 
