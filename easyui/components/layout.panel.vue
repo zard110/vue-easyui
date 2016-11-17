@@ -1,5 +1,19 @@
 <template>
-  <div></div>
+  <ce-panel
+    class="layout-panel"
+    v-show="!collapsed"
+    :id="id"
+    :title="computedTitle"
+    :iconClass="iconClass"
+    :do-size="doSize && !collapsed"
+    :class="[regionClass, splitClass]"
+    :width="width" :height="height" :left="left" :top="top"
+    body-class="layout-body">
+    <div slot="tools" v-if="collapsible">
+      <a href="javascript:void(0);" class="[collapseClass]" @click="collapse"></a>
+    </div>
+    <slot></slot>
+  </ce-panel>
 </template>
 
 <script>
@@ -8,7 +22,20 @@
   export default {
     name: 'ce-layout-panel',
 
+    data() {
+      return {
+        left: 0,
+        top: 0,
+        width: 0,
+        height: 0,
+        doSize: false,
+        collapsed: false
+      }
+    },
+
     props: {
+      id: String,
+
       /**
        * east 和 west 的值将转换成 width
        * north 和 south 的值将转换成 height
@@ -25,6 +52,8 @@
 
       title: String,
 
+      iconClass: String,
+
       /**
        * True to show a split bar which user can change the panel size.
        */
@@ -38,27 +67,38 @@
       }
     },
 
-    computed: {
-      /**
-       * 面板宽度
-       */
-      width() {
-        return ~['west', 'east'].indexOf(this.region) ? this.size : undefined
-      },
+    methods: {
+      collapse
+    },
 
-      /**
-       * 面板高度
-       */
-      height() {
-        return ~['north', 'south'].indexOf(this.region) ? this.size : undefined
+    computed: {
+
+      computedTitle() {
+          return this.title ? this.title : (this.collapsible ? ' ' : undefined)
       },
 
       splitClass() {
         return this.split ? 'layout-split-' + this.region : undefined
       },
 
-      expandClass() {
-        return this.collapsible ? 'layout-expand-' + this.region : undefined
+      regionClass() {
+        return 'layout-panel-' + this.region
+      },
+
+      collapseClass() {
+        if (!this.collapsible) return
+
+        switch (this.region) {
+          case 'west':
+            return 'layout-button-left'
+          case 'east':
+            return 'layout-button-right'
+          case 'north':
+            return 'layout-button-up'
+          case 'south':
+             return 'layout-button-down'
+          default:
+        }
       },
 
       splitHandles() {
@@ -76,13 +116,7 @@
           default:
             return
         }
-      }
-    },
-
-    mounted() {
-    },
-
-    beforeMount() {
+      },
     },
 
     created() {
@@ -95,22 +129,18 @@
           throw new Error('layout.panel MUST BE in layout!')
       }
 
-      parent['addLayoutPanel'](this.region, {
-        width: this.width,
-        height: this.height,
-        split: this.split,
-        title: this.title,
-        splitHandles: this.splitHandles,
-        splitClass: this.splitClass,
-        collapsible: this.collapsible,
-        collapsedSize: this.collapsedSize,
-        expandClass: this.expandClass
+      parent['addLayoutPanel'](this, {
+          width: this.width,
+          height: this.height,
+        top: this.top,
+        left: this.left,
+        split: this.split
       })
-    },
-
-    beforeCreate() {
     }
-
   }
 
+  function collapse() {
+    this.collapsed = true
+    this.$emit('collapse', this.region)
+  }
 </script>
