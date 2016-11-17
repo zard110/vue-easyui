@@ -57,6 +57,10 @@
         return this.split ? 'layout-split-' + this.region : undefined
       },
 
+      expandClass() {
+        return this.collapsible ? 'layout-expand-' + this.region : undefined
+      },
+
       splitHandles() {
         if (!this.split) return
 
@@ -99,7 +103,8 @@
         splitHandles: this.splitHandles,
         splitClass: this.splitClass,
         collapsible: this.collapsible,
-        collapsedSize: this.collapsedSize
+        collapsedSize: this.collapsedSize,
+        expandClass: this.expandClass
       })
     },
 

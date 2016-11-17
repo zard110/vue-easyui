@@ -6,7 +6,11 @@
            :class="{'panel-with-icon': hasIcon}">{{title}}</div>
       <div class="panel-icon" v-if="hasIcon"
            :class="[iconClass]" ></div>
-      <div class="panel-tool" v-if="tools"></div>
+      <div class="panel-tool" v-if="tools">
+        <a href="javascript:void(0);" class="panel-tool-a"
+           v-for="tool in tools"
+           :class="[tool.iconClass]" @click="tool.handler"></a>
+      </div>
     </div>
     <div class="panel-body" ref="body"
          :class="[{'panel-body-noheader': noHeader, 'panel-body-noborder': noBorder}, bodyClass]">
@@ -95,7 +99,9 @@
        */
       bodyClass: String,
 
-      splitHandles: String
+      splitHandles: String,
+
+      tools: Array
     },
 
     data() {
@@ -137,14 +143,8 @@
        */
       hasIcon() {
         return !!this.iconClass
-      },
-
-      /**
-       * 面板工具栏
-       */
-      tools() {
-        //TODO 根据配置生成工具栏按钮
       }
+
     },
 
     methods: {
@@ -152,7 +152,10 @@
       setLayoutSize,
       move,
       resize,
-      initSplit
+      initSplit,
+      alert() {
+          alert(123)
+      }
     },
 
     beforeMount() {

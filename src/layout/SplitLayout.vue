@@ -7,11 +7,17 @@
 <template>
   <ce-layout id="parent">
     <ce-layout-panel region="north" :size="64">north</ce-layout-panel>
-    <ce-layout-panel region="south" :size="64" :split="true">south</ce-layout-panel>
-    <ce-layout-panel region="west" :size="320" :split="true" :collapsible="true"
-                     title="West">west</ce-layout-panel>
-    <ce-layout-panel region="east" :size="200" :split="true">east</ce-layout-panel>
-    <ce-layout-panel region="center">
+
+    <ce-layout-panel region="south" :size="64" :split="true" :collapsible="true">south</ce-layout-panel>
+
+    <ce-layout-panel region="west" :size="320" :split="true" title="Menu"
+                     :collapsible="true">
+      west
+    </ce-layout-panel>
+
+    <ce-layout-panel region="east" :size="200" :collapsible="true">east</ce-layout-panel>
+
+    <ce-layout-panel region="center" title="Container">
 
       <!--<ce-layout id="child">-->
         <!--<ce-layout-panel slot="north" region="north" :size="84" :split="true">north</ce-layout-panel>-->
