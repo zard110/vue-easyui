@@ -156,9 +156,9 @@
   }
 
   function layout(top, left, width, height) {
+    if (top == this.top && left == this.left && width == this.width && height == this.height) return
 
-    console.log('layout: ', top, left, width, height)
-
+    console.log('layout: ', this.id, top, left, width, height)
     this.top = top
     this.left = left
     this.width = width

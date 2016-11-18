@@ -268,20 +268,25 @@
   /**
    * 添加对应面板
    * 面板初始化的时候就存在，只是隐藏起来
-   * @param info
+   * @param instance
    */
-  function addLayoutPanel(info) {
-    let region = info.region,
-      size = info.size,
+  function addLayoutPanel(instance) {
+    let region = instance.region,
+      size = instance.size,
       panel = this.panels[region]
 
     if (!panel) return
 
     panel.show = true
-    panel.split = info.split
-    panel.collapsible = info.collapsible
-    panel.expandToolClass = info.expandToolClass
-    panel.expandClass = info.expandClass
+    panel.width = instance.width
+    panel.height = instance.height
+    panel.top = instance.top
+    panel.left = instance.left
+    panel.split = instance.split
+    panel.collapsible = instance.collapsible
+    panel.collapsedSize = instance.collapsedSize
+    panel.expandToolClass = instance.expandToolClass
+    panel.expandClass = instance.expandClass
 
     if (~['west', 'east'].indexOf(region)) {
       panel.width = size
@@ -290,7 +295,7 @@
       panel.height = size
     }
 
-    this[region] = info
+    this[region] = instance
     console.log('addPanel', this.id, region)
   }
 
@@ -331,11 +336,11 @@
     east.left = center.left + center.width - offsetEast;
 
     ['west', 'east', 'north', 'south', 'center'].forEach((region) => {
-      let layout = this.panels[region],
-        panel = this[region]
+      let panel = this.panels[region],
+        instance = this[region]
 
-      if (layout.show && panel) {
-        panel.layout(layout.top, layout.left, layout.width, layout.height)
+      if (panel.show && panel) {
+        instance.layout(panel.top, panel.left, panel.width, panel.height)
       }
     })
 
@@ -351,11 +356,11 @@
 
     if (~['west', 'east'].indexOf(region)) {
       panel.lastWidth = panel.width
-      panel.width = 28
+      panel.width = panel.collapsedSize
     }
     else if (~['north', 'south'].indexOf(region)) {
       panel.lastHeight = panel.height
-      panel.height = 28
+      panel.height = panel.collapsedSize
     }
 
     this.$nextTick(() => this.doLayout())
@@ -374,7 +379,9 @@
       panel.height = panel.lastHeight
     }
 
-    instance.expand()
-    this.$nextTick(() => this.doLayout())
+    this.$nextTick(() => {
+      this.doLayout()
+      instance.expand()
+    })
   }
 </script>
