@@ -5,7 +5,7 @@
     :id="id"
     :title="computedTitle"
     :iconClass="iconClass"
-    :do-size="doSize && !collapsed"
+    :do-size="!collapsed"
     :class="[regionClass, splitClass]"
     :width="width" :height="height" :left="left" :top="top"
     body-class="layout-body">
@@ -28,7 +28,6 @@
         top: 0,
         width: 0,
         height: 0,
-        doSize: false,
         collapsed: false
       }
     },
@@ -68,7 +67,8 @@
     },
 
     methods: {
-      collapse
+      collapse,
+      layout
     },
 
     computed: {
@@ -137,6 +137,13 @@
         split: this.split
       })
     }
+  }
+
+  function layout(top, left, width, height) {
+    this.top = top
+    this.left = left
+    this.width = width
+    this.height = height
   }
 
   function collapse() {

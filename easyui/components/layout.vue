@@ -79,13 +79,11 @@
          */
         panels: ['north', 'east', 'south', 'west', 'center'].reduce((panels, region) => {
           panels[region] = {
-            id: '',
             region: region,
             show: false,
             split: false,
-            splitting: false,
-            width: 0, height: 0, left: 0, top: 0,
-            collapsed: false
+            collapsed: false,
+            width: 0, height: 0, left: 0, top: 0
           }
 
           return panels
@@ -264,22 +262,26 @@
   /**
    * 添加对应面板
    * 面板初始化的时候就存在，只是隐藏起来
-   * @param panel
    * @param info
    */
-  function addLayoutPanel(panel) {
-    if (!panel) return
-    let region = panel.region,
-      size = panel.size
+  function addLayoutPanel(info) {
+    let region = info.region,
+      size = info.size,
+      panel = this.panels[region]
 
+    if (!panel) return
+
+    panel.show = true
+    panel.split = info.split
+    panel.collapsed = info.collapsed
     if (~['west', 'east'].indexOf(region)) {
-        panel.width = size
+      panel.width = size
     }
     else if (~['north', 'south']) {
-        panel.height = size
+      panel.height = size
     }
 
-    this[region] = this
+    this[region] = info
     console.log('addPanel', this.id, region)
   }
 
@@ -290,22 +292,20 @@
    * @param height
    */
   function doLayout(width, height) {
-    let north = this['north'],
-      south = this['south'],
-      west = this['west'],
-      east = this['east'],
-      center = this['center'],
+    let north = this.panels['north'],
+      south = this.panels['south'],
+      west = this.panels['west'],
+      east = this.panels['east'],
+      center = this.panels['center'],
 
       // 处理 border 重合问题
-      offsetNorth = (north && !north.split || north.collapsed) ? 1 : 0,
-      offsetSouth = (south && !south.split || south.collapsed) ? 1 : 0,
+      offsetNorth = (north.show && !north.split || north.collapsed) ? 1 : 0,
+      offsetSouth = (south.show && !south.split || south.collapsed) ? 1 : 0,
       offsetHeight = offsetNorth + offsetSouth,
 
-      offsetWest = (west && !west.split || west.collapsed) ? 1 : 0,
-      offsetEast = (east && !east.split || east.collapsed) ? 1 : 0,
+      offsetWest = (west.show && !west.split || west.collapsed) ? 1 : 0,
+      offsetEast = (east.show && !east.split || east.collapsed) ? 1 : 0,
       offsetWidth = offsetWest + offsetEast
-
-    north.doSize = south.doSize = west.doSize = east.doSize = center.doSize = true
 
     this.width = width || this.width
     this.height = height || this.height
@@ -319,7 +319,16 @@
     west.top = east.top = center.top = north.height - offsetNorth
     center.left = west.width - offsetWest
     south.top = center.top + center.height - offsetSouth
-    east.left = center.left + center.width - offsetEast
+    east.left = center.left + center.width - offsetEast;
+
+    ['west', 'east', 'north', 'south', 'center'].forEach((region) => {
+        let layout = this.panels[region],
+          panel = this[region]
+
+        if (layout.show && panel) {
+          panel.layout(layout.top, layout.left, layout.width, layout.height)
+        }
+      })
 
     console.log('doLayout', width, height, north.width, north.height)
   }
