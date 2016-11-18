@@ -330,6 +330,6 @@
         }
       })
 
-    console.log('doLayout', width, height, north.width, north.height)
+    console.log('doLayout', width, height)
   }
 </script>

@@ -3,14 +3,15 @@
     class="layout-panel"
     v-show="!collapsed"
     :id="id"
-    :title="computedTitle"
+    :title="title"
     :iconClass="iconClass"
     :do-size="!collapsed"
     :class="[regionClass, splitClass]"
     :width="width" :height="height" :left="left" :top="top"
+    :tools="tools"
     body-class="layout-body">
     <div slot="tools" v-if="collapsible">
-      <a href="javascript:void(0);" class="[collapseClass]" @click="collapse"></a>
+      <a href="javascript:void(0);" :class="[collapseClass]" @click="collapse"></a>
     </div>
     <slot></slot>
   </ce-panel>
@@ -33,8 +34,6 @@
     },
 
     props: {
-      id: String,
-
       /**
        * east 和 west 的值将转换成 width
        * north 和 south 的值将转换成 height
@@ -72,11 +71,9 @@
     },
 
     computed: {
-
-      computedTitle() {
-          return this.title ? this.title : (this.collapsible ? ' ' : undefined)
+      tools() {
+        return this.collapsible ? [] : undefined
       },
-
       splitClass() {
         return this.split ? 'layout-split-' + this.region : undefined
       },
@@ -129,13 +126,11 @@
           throw new Error('layout.panel MUST BE in layout!')
       }
 
-      parent['addLayoutPanel'](this, {
-          width: this.width,
-          height: this.height,
-        top: this.top,
-        left: this.left,
-        split: this.split
-      })
+      this['_parent'] = parent
+      if (parent['id']) {
+        this.id = parent['id'] + '_' + this.region
+      }
+      parent['addLayoutPanel'](this)
     }
   }
 

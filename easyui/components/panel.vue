@@ -10,6 +10,7 @@
         <a href="javascript:void(0);" class="panel-tool-a"
            v-for="tool in tools"
            :class="[tool.iconClass]" @click="tool.handler"></a>
+        <slot name="tools"></slot>
       </div>
     </div>
     <div class="panel-body" ref="body"
@@ -126,7 +127,7 @@
        * @returns {boolean}
        */
       noHeader() {
-        return !this.title
+        return !this.title && !this.tools
       },
 
       /**
@@ -144,7 +145,6 @@
       hasIcon() {
         return !!this.iconClass
       }
-
     },
 
     methods: {
@@ -152,10 +152,7 @@
       setLayoutSize,
       move,
       resize,
-      initSplit,
-      alert() {
-          alert(123)
-      }
+      initSplit
     },
 
     beforeMount() {
@@ -225,7 +222,7 @@
           el = $('body')
       }
       else {
-          el = $(parent.$el)
+          el = $(parent.$refs['body'])
       }
 
       width = el.width()
