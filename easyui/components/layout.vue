@@ -183,6 +183,27 @@
     }
   }
 
+
+
+  function setSplitStyle(region, data) {
+    switch (region) {
+      case 'west':
+        this.splitLeft = data.left + (data.width - data.startWidth) + data.startWidth - data.deltaWidth
+        break
+      case 'east':
+        this.splitLeft = data.left
+        break
+      case 'north':
+        this.splitTop = data.top + (data.height - data.startHeight) + data.startHeight - data.deltaHeight
+        break
+      case 'south':
+        this.splitTop = data.top
+        break
+      default:
+        return
+    }
+  }
+
   function onStopResize(e) {
     let data = e.data,
       region = getResizeRegion(data.dir),
@@ -204,28 +225,9 @@
           return
       }
 
-      this.doLayout(this.width, this.height)
+      this.doLayout()
     }
-    console.log('onStopResize', Object.assign({}, data))
-  }
-
-  function setSplitStyle(region, data) {
-    switch (region) {
-      case 'west':
-        this.splitLeft = data.left + (data.width - data.startWidth) + data.startWidth - data.deltaWidth
-        break
-      case 'east':
-        this.splitLeft = data.left
-        break
-      case 'north':
-        this.splitTop = data.top + (data.height - data.startHeight) + data.startHeight - data.deltaHeight
-        break
-      case 'south':
-        this.splitTop = data.top
-        break
-      default:
-        return
-    }
+//    console.log('onStopResize', Object.assign({}, data))
   }
 
   function onResize(e) {
@@ -247,7 +249,7 @@
       panel.splitting = true
       this.setSplitStyle(region, data)
     }
-    console.log('onStartResize', Object.assign({}, data))
+//    console.log('onStartResize', Object.assign({}, data))
   }
 
   function getResizeRegion(dir) {

@@ -9,7 +9,7 @@
     :class="[regionClass, splitClass]"
     :width="width" :height="height" :left="left" :top="top"
     :tools="tools"
-    body-class="layout-body">
+    body-class="layout-body" v-resizable="resizableOptions">
     <div slot="tools" v-if="collapsible">
       <a href="javascript:void(0);" :class="[collapseToolClass]" @click="collapse"></a>
     </div>
@@ -75,6 +75,7 @@
       tools() {
         return this.collapsible ? [] : undefined
       },
+
       splitClass() {
         return this.split ? 'layout-split-' + this.region : undefined
       },
@@ -119,7 +120,27 @@
         }
       },
 
-      splitHandles() {
+      resizableOptions() {
+        let parent = this['_parent']
+        return {
+          edge: 8,
+          disabled: !this.split,
+          handles: this.handles,
+          onStartResize(e) {
+            parent.onStartResize(e)
+          },
+          onResize(e) {
+            parent.onResize(e)
+            return false
+          },
+          onStopResize(e) {
+            parent.onStopResize(e)
+            return false
+          }
+        }
+      },
+
+      handles() {
         if (!this.split) return
 
         switch (this.region) {
@@ -152,6 +173,10 @@
         this.id = parent['id'] + '_' + this.region
       }
       parent['addLayoutPanel'](this)
+    },
+
+    mounted() {
+      this.$el.dataset['handles'] = this.splitHandles
     }
   }
 
