@@ -175,9 +175,6 @@
       parent['addLayoutPanel'](this)
     },
 
-    mounted() {
-      this.$el.dataset['handles'] = this.splitHandles
-    }
   }
 
   function layout(top, left, width, height) {
