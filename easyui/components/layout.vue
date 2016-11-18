@@ -6,36 +6,41 @@
     :border="false"
     @resize="doLayout">
 
-    <ce-panel
-      class="layout-panel"
-      v-for="(panel, region) in panels"
-      v-if="panel.show"
-      v-show="!panel.collapsed"
-      :id="panel.id"
-      :ref="region"
-      :title="panel.title"
-      :icon-class="panel.iconClass"
-      :split-handles="panel.splitHandles"
-      :do-size="panel.show && !panel.collapsed" :width="panel.width" :height="panel.height" :left="panel.left" :top="panel.top"
-      :class="[panel.regionClass, panel.splitClass]"
-      :tools="panel.tools"
-      body-class="layout-body"
+    <!--<ce-panel-->
+      <!--class="layout-panel"-->
+      <!--v-for="(panel, region) in panels"-->
+      <!--v-if="panel.show"-->
+      <!--v-show="!panel.collapsed"-->
+      <!--:id="panel.id"-->
+      <!--:ref="region"-->
+      <!--:title="panel.title"-->
+      <!--:icon-class="panel.iconClass"-->
+      <!--:split-handles="panel.splitHandles"-->
+      <!--:do-size="panel.show && !panel.collapsed" :width="panel.width" :height="panel.height" :left="panel.left" :top="panel.top"-->
+      <!--:class="[panel.regionClass, panel.splitClass]"-->
+      <!--:tools="panel.tools"-->
+      <!--body-class="layout-body"-->
 
-      @onStartResize="onStartResize"
-      @onStopResize="onStopResize"
-      @onResize="onResize">
-      {{panel.width}}×{{panel.height}}
-    </ce-panel>
+      <!--@onStartResize="onStartResize"-->
+      <!--@onStopResize="onStopResize"-->
+      <!--@onResize="onResize">-->
+      <!--{{panel.width}}×{{panel.height}}-->
+      <!--<slot :name="region"></slot>-->
+    <!--</ce-panel>-->
+
+    <slot></slot>
 
     <ce-panel
       class="layout-expand"
       v-for="(panel, region) in panels"
       v-if="panel.collapsible && panel.show"
       v-show="panel.collapsed"
-      title=" "
-      :left="panel.left" :top="panel.top" :width="panel.width" :height="panel.height"
-      :class="[panel.expandClass]" :tools="panel.expandTools">
-      <div style="display: none;">{{panel.width}}×{{panel.height}}</div>
+      :class="[panel.expandClass]"
+      :tools="[]"
+      :left="panel.left" :top="panel.top" :width="panel.width" :height="panel.height">
+      <div slot="tools">
+        <a href="javascript:void(0);" :class="[panel.expandToolClass]" @click="expand(region)"></a>
+      </div>
     </ce-panel>
 
     <div class="layout-split-proxy-h" v-show="splittingH"
@@ -44,8 +49,6 @@
          style="display: block; width: 5px;" :style="splittingVStyle"></div>
     <div class="layout-mask" v-show="splitting"
          style="top: 0; left: 0;" :style="layoutMaskStyle"></div>
-
-    <slot></slot>
   </ce-panel>
 </template>
 
@@ -78,16 +81,13 @@
          */
         panels: ['north', 'east', 'south', 'west', 'center'].reduce((panels, region) => {
           panels[region] = {
-            id: 'layout_panel_' + this.id + '_' + region,
             region: region,
             show: false,
             split: false,
             splitting: false,
-            splitClass: '',
-            regionClass: 'layout-panel-' + region,
-            width: 0, height: 0, left: 0, top: 0,
-            tools: [], expandTools: [],
-            collapsed: false
+            collapsed: false,
+            collapsible: false,
+            width: 0, height: 0, left: 0, top: 0
           }
 
           return panels
@@ -161,9 +161,8 @@
       onStopResize,
       onResize,
       setSplitStyle,
-      createPanelTools,
-      collapsePanel,
-      expandPanel
+      collapse,
+      expand
     },
 
     mounted() {
@@ -178,11 +177,30 @@
     },
 
     created() {
-      // 添加对应的面板
-//      LayoutEvents.$on('add', this.addLayoutPanel)
     },
 
     beforeCreate() {
+    }
+  }
+
+
+
+  function setSplitStyle(region, data) {
+    switch (region) {
+      case 'west':
+        this.splitLeft = data.left + (data.width - data.startWidth) + data.startWidth - data.deltaWidth
+        break
+      case 'east':
+        this.splitLeft = data.left
+        break
+      case 'north':
+        this.splitTop = data.top + (data.height - data.startHeight) + data.startHeight - data.deltaHeight
+        break
+      case 'south':
+        this.splitTop = data.top
+        break
+      default:
+        return
     }
   }
 
@@ -207,28 +225,9 @@
           return
       }
 
-      this.doLayout(this.width, this.height)
+      this.doLayout()
     }
-    console.log('onStopResize', Object.assign({}, data))
-  }
-
-  function setSplitStyle(region, data) {
-    switch (region) {
-      case 'west':
-        this.splitLeft = data.left + (data.width - data.startWidth) + data.startWidth - data.deltaWidth
-        break
-      case 'east':
-        this.splitLeft = data.left
-        break
-      case 'north':
-        this.splitTop = data.top + (data.height - data.startHeight) + data.startHeight - data.deltaHeight
-        break
-      case 'south':
-        this.splitTop = data.top
-        break
-      default:
-        return
-    }
+//    console.log('onStopResize', Object.assign({}, data))
   }
 
   function onResize(e) {
@@ -250,7 +249,7 @@
       panel.splitting = true
       this.setSplitStyle(region, data)
     }
-    console.log('onStartResize', Object.assign({}, data))
+//    console.log('onStartResize', Object.assign({}, data))
   }
 
   function getResizeRegion(dir) {
@@ -271,100 +270,37 @@
   /**
    * 添加对应面板
    * 面板初始化的时候就存在，只是隐藏起来
-   * @param layout
-   * @param region
-   * @param info
+   * @param instance
    */
-  function addLayoutPanel(region, info) {
+  function addLayoutPanel(instance) {
+    let region = instance.region,
+      size = instance.size,
+      panel = this.panels[region]
 
-
-
-//    this.panels = Object.assign({}, this.panels, info)
-
-    let panel = this.panels[region]
     if (!panel) return
 
     panel.show = true
-    panel.title = info.title ? info.title : (info.collapsible ? ' ' : undefined)
-    panel.width = info.width ? info.width : 0
-    panel.height = info.height ? info.height : 0
-    panel.split = info.split
-    panel.splitHandles = info.splitHandles
-    panel.splitClass = info.splitClass
-    panel.collapsible = info.collapsible
-    panel.collapsedSize = info.collapsedSize
-    panel.expandClass = info.expandClass
+    panel.width = instance.width
+    panel.height = instance.height
+    panel.top = instance.top
+    panel.left = instance.left
+    panel.split = instance.split
+    panel.collapsible = instance.collapsible
+    panel.collapsedSize = instance.collapsedSize
+    panel.expandToolClass = instance.expandToolClass
+    panel.expandClass = instance.expandClass
 
-    if (panel.collapsible) {
-      panel.tools = this.createPanelTools(panel, true)
-      panel.expandTools = this.createPanelTools(panel, false)
+    if (~['west', 'east'].indexOf(region)) {
+      panel.width = size
+    }
+    else if (~['north', 'south']) {
+      panel.height = size
     }
 
-    console.log('addPanel', this.id, region, info)
+    this[region] = instance
+    console.log('addPanel', this.id, region)
   }
 
-  function createPanelTools(panel, isCollapse) {
-    let iconClass = ''
-    switch (panel.region) {
-      case 'west':
-        iconClass = isCollapse ? 'layout-button-left' : 'layout-button-right'
-        break
-      case 'east':
-        iconClass = isCollapse ? 'layout-button-right' : 'layout-button-left'
-        break
-      case 'north':
-        iconClass = isCollapse ? 'layout-button-up' : 'layout-button-down'
-        break
-      case 'south':
-        iconClass = isCollapse ? 'layout-button-down' : 'layout-button-up'
-        break
-      default:
-    }
-
-    if (!iconClass) return
-
-    return [
-      {
-          iconClass: iconClass,
-          handler: () => isCollapse ? this.collapsePanel(panel) : this.expandPanel(panel)
-      }
-    ]
-  }
-
-  function collapsePanel(panel) {
-    if (typeof panel == 'string') {
-      panel = this.panels[panel]
-      if (!panel) return
-    }
-
-    let region = panel.region
-    panel.collapsed = true
-
-    if ('west' == region || 'east' == region) {
-      panel.lastWidth = panel.width
-      panel.width = panel.collapsedSize
-    }
-    else if ('north' == region || 'south' == region) {
-      panel.lastHeight = panel.height
-      panel.height = panel.collapsedSize
-    }
-
-    this.$nextTick(() => this.doLayout(this.width, this.height))
-  }
-
-  function expandPanel(panel) {
-    let region = panel.region
-    panel.collapsed = false
-
-    if ('west' == region || 'east' == region) {
-      panel.width = panel.lastWidth
-    }
-    else if ('north' == region || 'south' == region) {
-      panel.height = panel.lastHeight
-    }
-
-    this.$nextTick(() => this.doLayout(this.width, this.height))
-  }
 
   /**
    * 进行布局
@@ -372,6 +308,9 @@
    * @param height
    */
   function doLayout(width, height) {
+    width = width || this.width
+    height = height || this.height
+
     let north = this.panels['north'],
       south = this.panels['south'],
       west = this.panels['west'],
@@ -387,9 +326,6 @@
       offsetEast = (east.show && !east.split || east.collapsed) ? 1 : 0,
       offsetWidth = offsetWest + offsetEast
 
-    this.width = width
-    this.height = height
-
     // size
     north.width = south.width = width
     west.height = east.height = center.height = (height - north.height - south.height) + offsetHeight
@@ -399,8 +335,55 @@
     west.top = east.top = center.top = north.height - offsetNorth
     center.left = west.width - offsetWest
     south.top = center.top + center.height - offsetSouth
-    east.left = center.left + center.width - offsetEast
+    east.left = center.left + center.width - offsetEast;
 
-    console.log('doLayout', width, height)
+    ['west', 'east', 'north', 'south', 'center'].forEach((region) => {
+      let panel = this.panels[region],
+        instance = this[region]
+
+      if (panel.show && panel) {
+        instance.layout(panel.top, panel.left, panel.width, panel.height)
+      }
+    })
+
+    this.width = width
+    this.height = height
+
+    console.log('doLayout', this.width, this.height)
+  }
+
+  function collapse(region) {
+    let panel = this.panels[region]
+    panel.collapsed = true
+
+    if (~['west', 'east'].indexOf(region)) {
+      panel.lastWidth = panel.width
+      panel.width = panel.collapsedSize
+    }
+    else if (~['north', 'south'].indexOf(region)) {
+      panel.lastHeight = panel.height
+      panel.height = panel.collapsedSize
+    }
+
+    this.$nextTick(() => this.doLayout())
+  }
+
+  function expand(region) {
+    let panel = this.panels[region],
+      instance = this[region]
+
+    panel.collapsed = false
+
+    if (~['west', 'east'].indexOf(region)) {
+      panel.width = panel.lastWidth
+    }
+    else if (~['north', 'south'].indexOf(region)) {
+      panel.height = panel.lastHeight
+    }
+
+    this.$nextTick(() => {
+      this.doLayout()
+      instance.expand()
+    })
   }
 </script>

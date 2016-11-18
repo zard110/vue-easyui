@@ -10,6 +10,7 @@
         <a href="javascript:void(0);" class="panel-tool-a"
            v-for="tool in tools"
            :class="[tool.iconClass]" @click="tool.handler"></a>
+        <slot name="tools"></slot>
       </div>
     </div>
     <div class="panel-body" ref="body"
@@ -99,8 +100,6 @@
        */
       bodyClass: String,
 
-      splitHandles: String,
-
       tools: Array
     },
 
@@ -114,9 +113,8 @@
         /**
          * Current height of the panel
          */
-        currentHeight: 0,
+        currentHeight: 0
 
-        isSplit: false
       }
     },
 
@@ -126,7 +124,7 @@
        * @returns {boolean}
        */
       noHeader() {
-        return !this.title
+        return !this.title && !this.tools
       },
 
       /**
@@ -144,64 +142,35 @@
       hasIcon() {
         return !!this.iconClass
       }
-
     },
 
     methods: {
       getLayoutSize,
       setLayoutSize,
       move,
-      resize,
-      initSplit,
-      alert() {
-          alert(123)
-      }
+      resize
     },
 
     beforeMount() {
       // 需要在beforeMount节点执行，以确保能在子元素之前resize
       this.$nextTick(() => this.resize())
     },
+
     mounted() {
       // 仅根节点响应窗口resize事件
       if (this.$el === this.$root.$el) {
         LayoutEvents.$on('window-resize', () => this.$nextTick(() => this.resize()))
       }
+    },
 
-      this.initSplit()
-    },
     updated() {
-      this.initSplit()
     },
+
     beforeUpdate() {
       this.$nextTick(() => this.resize())
     },
+
     created() {
-    }
-  }
-
-  function initSplit() {
-    let el = $(this.$el),
-      vm = this
-
-    if (!this.isSplit && this.splitHandles) {
-      console.log('split', this.id, this.splitHandles)
-      el.resizable({
-        handles: this.splitHandles,
-        edge: 10,
-        onStartResize(e) {
-          vm.$emit('onStartResize', e)
-        },
-        onResize(e) {
-          vm.$emit('onResize', e)
-          return false
-        },
-        onStopResize(e) {
-          vm.$emit('onStopResize', e)
-          return false
-        }
-      })
-      this.isSplit = true
     }
   }
 
@@ -225,7 +194,7 @@
           el = $('body')
       }
       else {
-          el = $(parent.$el)
+          el = $(parent.$refs['body'])
       }
 
       width = el.width()

@@ -5,7 +5,7 @@ import Panel from './components/panel.vue'
 import Layout from './components/layout.vue'
 import LayoutPanel from './components/layout.panel.vue'
 
-import Resizable from './directives/resizable/vue.resizable'
+import Resizable from './directives/resizable'
 
 const install = function (Vue) {
   /* istanbul ignore if */
