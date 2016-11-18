@@ -35,9 +35,11 @@
       v-for="(panel, region) in panels"
       v-if="panel.collapsible && panel.show"
       v-show="panel.collapsed"
+      :class="[panel.expandClass]"
+      :tools="[]"
       :left="panel.left" :top="panel.top" :width="panel.width" :height="panel.height">
       <div slot="tools">
-        <a href="javascript:void(0);" class="" @click="expand"></a>
+        <a href="javascript:void(0);" :class="[panel.expandToolClass]" @click="expand(region)"></a>
       </div>
     </ce-panel>
 
@@ -278,6 +280,9 @@
     panel.show = true
     panel.split = info.split
     panel.collapsible = info.collapsible
+    panel.expandToolClass = info.expandToolClass
+    panel.expandClass = info.expandClass
+
     if (~['west', 'east'].indexOf(region)) {
       panel.width = size
     }
@@ -343,11 +348,33 @@
   function collapse(region) {
     let panel = this.panels[region]
     panel.collapsed = true
-    panel.width = 28
+
+    if (~['west', 'east'].indexOf(region)) {
+      panel.lastWidth = panel.width
+      panel.width = 28
+    }
+    else if (~['north', 'south'].indexOf(region)) {
+      panel.lastHeight = panel.height
+      panel.height = 28
+    }
+
     this.$nextTick(() => this.doLayout())
   }
 
   function expand(region) {
+    let panel = this.panels[region],
+      instance = this[region]
 
+    panel.collapsed = false
+
+    if (~['west', 'east'].indexOf(region)) {
+      panel.width = panel.lastWidth
+    }
+    else if (~['north', 'south'].indexOf(region)) {
+      panel.height = panel.lastHeight
+    }
+
+    instance.expand()
+    this.$nextTick(() => this.doLayout())
   }
 </script>

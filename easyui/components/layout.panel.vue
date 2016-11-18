@@ -11,7 +11,7 @@
     :tools="tools"
     body-class="layout-body">
     <div slot="tools" v-if="collapsible">
-      <a href="javascript:void(0);" :class="[collapseClass]" @click="collapse"></a>
+      <a href="javascript:void(0);" :class="[collapseToolClass]" @click="collapse"></a>
     </div>
     <slot></slot>
   </ce-panel>
@@ -67,6 +67,7 @@
 
     methods: {
       collapse,
+      expand,
       layout
     },
 
@@ -82,7 +83,27 @@
         return 'layout-panel-' + this.region
       },
 
-      collapseClass() {
+      expandClass() {
+        return this.collapsible ? 'layout-expand-' + this.region : undefined
+      },
+
+      expandToolClass() {
+        if (!this.collapsible) return
+
+        switch (this.region) {
+          case 'west':
+            return 'layout-button-right'
+          case 'east':
+            return 'layout-button-left'
+          case 'north':
+            return 'layout-button-down'
+          case 'south':
+            return 'layout-button-up'
+          default:
+        }
+      },
+
+      collapseToolClass() {
         if (!this.collapsible) return
 
         switch (this.region) {
@@ -147,5 +168,9 @@
   function collapse() {
     this.collapsed = true
     this['_parent'].collapse(this.region)
+  }
+
+  function expand() {
+    this.collapsed = false
   }
 </script>
