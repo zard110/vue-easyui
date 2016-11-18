@@ -28,16 +28,18 @@
       <!--<slot :name="region"></slot>-->
     <!--</ce-panel>-->
 
-    <!--<ce-panel-->
-      <!--class="layout-expand"-->
-      <!--v-for="(panel, region) in panels"-->
-      <!--v-if="panel.collapsible && panel.show"-->
-      <!--v-show="panel.collapsed"-->
-      <!--title=" "-->
-      <!--:left="panel.left" :top="panel.top" :width="panel.width" :height="panel.height"-->
-      <!--:class="[panel.expandClass]" :tools="panel.expandTools">-->
-      <!--<div style="display: none;">{{panel.width}}×{{panel.height}}</div>-->
-    <!--</ce-panel>-->
+    <slot></slot>
+
+    <ce-panel
+      class="layout-expand"
+      v-for="(panel, region) in panels"
+      v-if="panel.collapsible && panel.show"
+      v-show="panel.collapsed"
+      :left="panel.left" :top="panel.top" :width="panel.width" :height="panel.height">
+      <div slot="tools">
+        <a href="javascript:void(0);" class="" @click="expand"></a>
+      </div>
+    </ce-panel>
 
     <div class="layout-split-proxy-h" v-show="splittingH"
          style="display: block; left: 0; height: 5px;" :style="splittingHStyle"></div>
@@ -45,8 +47,6 @@
          style="display: block; width: 5px;" :style="splittingVStyle"></div>
     <div class="layout-mask" v-show="splitting"
          style="top: 0; left: 0;" :style="layoutMaskStyle"></div>
-
-    <slot></slot>
   </ce-panel>
 </template>
 
@@ -82,7 +82,9 @@
             region: region,
             show: false,
             split: false,
+            splitting: false,
             collapsed: false,
+            collapsible: false,
             width: 0, height: 0, left: 0, top: 0
           }
 
@@ -156,7 +158,9 @@
       onStartResize,
       onStopResize,
       onResize,
-      setSplitStyle
+      setSplitStyle,
+      collapse,
+      expand
     },
 
     mounted() {
@@ -273,7 +277,7 @@
 
     panel.show = true
     panel.split = info.split
-    panel.collapsed = info.collapsed
+    panel.collapsible = info.collapsible
     if (~['west', 'east'].indexOf(region)) {
       panel.width = size
     }
@@ -292,6 +296,9 @@
    * @param height
    */
   function doLayout(width, height) {
+    width = width || this.width
+    height = height || this.height
+
     let north = this.panels['north'],
       south = this.panels['south'],
       west = this.panels['west'],
@@ -307,9 +314,6 @@
       offsetEast = (east.show && !east.split || east.collapsed) ? 1 : 0,
       offsetWidth = offsetWest + offsetEast
 
-    this.width = width || this.width
-    this.height = height || this.height
-
     // size
     north.width = south.width = width
     west.height = east.height = center.height = (height - north.height - south.height) + offsetHeight
@@ -322,14 +326,28 @@
     east.left = center.left + center.width - offsetEast;
 
     ['west', 'east', 'north', 'south', 'center'].forEach((region) => {
-        let layout = this.panels[region],
-          panel = this[region]
+      let layout = this.panels[region],
+        panel = this[region]
 
-        if (layout.show && panel) {
-          panel.layout(layout.top, layout.left, layout.width, layout.height)
-        }
-      })
+      if (layout.show && panel) {
+        panel.layout(layout.top, layout.left, layout.width, layout.height)
+      }
+    })
 
-    console.log('doLayout', width, height)
+    this.width = width
+    this.height = height
+
+    console.log('doLayout', this.width, this.height)
+  }
+
+  function collapse(region) {
+    let panel = this.panels[region]
+    panel.collapsed = true
+    panel.width = 28
+    this.$nextTick(() => this.doLayout())
+  }
+
+  function expand(region) {
+
   }
 </script>

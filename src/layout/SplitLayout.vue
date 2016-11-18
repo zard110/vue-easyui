@@ -4,7 +4,7 @@
   }
 </script>
 
-<template>id=""
+<template>
   <ce-layout id="parent">
     <ce-layout-panel region="south" :size="48">south</ce-layout-panel>
     <ce-layout-panel region="west" :size="320" :split="true" title="Menu" :collapsible="true">menu</ce-layout-panel>

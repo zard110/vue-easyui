@@ -135,6 +135,9 @@
   }
 
   function layout(top, left, width, height) {
+
+    console.log('layout: ', top, left, width, height)
+
     this.top = top
     this.left = left
     this.width = width
@@ -143,6 +146,6 @@
 
   function collapse() {
     this.collapsed = true
-    this.$emit('collapse', this.region)
+    this['_parent'].collapse(this.region)
   }
 </script>
