@@ -6,28 +6,6 @@
     :border="false"
     @resize="doLayout">
 
-    <!--<ce-panel-->
-      <!--class="layout-panel"-->
-      <!--v-for="(panel, region) in panels"-->
-      <!--v-if="panel.show"-->
-      <!--v-show="!panel.collapsed"-->
-      <!--:id="panel.id"-->
-      <!--:ref="region"-->
-      <!--:title="panel.title"-->
-      <!--:icon-class="panel.iconClass"-->
-      <!--:split-handles="panel.splitHandles"-->
-      <!--:do-size="panel.show && !panel.collapsed" :width="panel.width" :height="panel.height" :left="panel.left" :top="panel.top"-->
-      <!--:class="[panel.regionClass, panel.splitClass]"-->
-      <!--:tools="panel.tools"-->
-      <!--body-class="layout-body"-->
-
-      <!--@onStartResize="onStartResize"-->
-      <!--@onStopResize="onStopResize"-->
-      <!--@onResize="onResize">-->
-      <!--{{panel.width}}×{{panel.height}}-->
-      <!--<slot :name="region"></slot>-->
-    <!--</ce-panel>-->
-
     <slot></slot>
 
     <ce-panel
@@ -44,9 +22,9 @@
     </ce-panel>
 
     <div class="layout-split-proxy-h" v-show="splittingH"
-         style="display: block; left: 0; height: 5px;" :style="splittingHStyle"></div>
+         style="left: 0; height: 5px;" :style="splittingHStyle"></div>
     <div class="layout-split-proxy-v" v-show="splittingV"
-         style="display: block; width: 5px;" :style="splittingVStyle"></div>
+         style="width: 5px;" :style="splittingVStyle"></div>
     <div class="layout-mask" v-show="splitting"
          style="top: 0; left: 0;" :style="layoutMaskStyle"></div>
   </ce-panel>
@@ -56,6 +34,11 @@
   .layout {
     position: absolute;
   }
+  .layout-split-proxy-h,
+  .layout-split-proxy-v {
+    display: block;
+  }
+
 </style>
 
 <script>
