@@ -1,4 +1,5 @@
 import $ from 'jquery'
+import _ from 'underscore'
 
 export default {
   name: 'resizable',
@@ -34,7 +35,7 @@ $.fn.resizable = function(options, params) {
     }
 
     // bind mouse event using namespace resizable
-    $(this).bind('mousemove.resizable', {target:this}, function(e){
+    $(this).bind('mousemove.resizable', {target:this}, _.throttle(function(e){
       if ($.fn.resizable.isResizing){return}
       let dir = getDirection(e);
       if (dir == '') {
@@ -42,7 +43,7 @@ $.fn.resizable = function(options, params) {
       } else {
         $(e.data.target).css('cursor', dir + '-resize');
       }
-    }).bind('mouseleave.resizable', {target:this}, function(e){
+    }, 500)).bind('mouseleave.resizable', {target:this}, function(e){
       $(e.data.target).css('cursor', '');
     }).bind('mousedown.resizable', {target:this}, function(e){
       let dir = getDirection(e);
