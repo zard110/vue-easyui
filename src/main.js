@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import App from './layout/SplitLayout.vue'
+import App from './accordion/Accordion.vue'
 
 import EasyUI from '../easyui/index'
 

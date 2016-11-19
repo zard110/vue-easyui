@@ -4,6 +4,7 @@ import './icon.css'
 import Panel from './components/panel.vue'
 import Layout from './components/layout.vue'
 import LayoutPanel from './components/layout.panel.vue'
+import Accordion from './components/accordion.vue'
 
 import Resizable from './directives/resizable'
 
@@ -14,6 +15,7 @@ const install = function (Vue) {
   Vue.component(Panel.name, Panel)
   Vue.component(Layout.name, Layout)
   Vue.component(LayoutPanel.name, LayoutPanel)
+  Vue.component(Accordion.name, Accordion)
 
   Vue.directive(Resizable.name, Resizable)
 };
