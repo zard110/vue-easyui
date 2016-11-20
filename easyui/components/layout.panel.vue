@@ -18,8 +18,6 @@
 </template>
 
 <script>
-  import LayoutEvents from './layout.events'
-
   export default {
     name: 'ce-layout-panel',
 

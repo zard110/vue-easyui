@@ -43,7 +43,6 @@
 
 <script>
   import $ from 'jquery'
-  import LayoutEvents from './layout.events'
 
   export default {
     name: 'ce-layout',
